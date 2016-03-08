@@ -4,7 +4,7 @@
  *  Created on: Feb 27, 2016
  *      Author: danielwalsh
  */
-#include <stdint.h>
+
 #include "TM4C123GH6PM.h"
 #include "bsp.h"
 
@@ -17,8 +17,9 @@ void ADC1Seq3_IRQHandler(void) {
 	ADC1->ISC = (1<<3);
 }
 
+
 /*.........................................................................*/
-void SysTick_Init(void) { unsigned long delay = 0;
+void SysTick_Init(void) {
 	SYSCTL->RCGCADC  =  (1<<1);
 	SYSCTL->RCGCGPIO =  (1<<4)|(1<<5);
 }
@@ -41,15 +42,13 @@ void GPIOE_Init(void) {
 
 /* adc1 initialization......................................................*/
 void ADC1_Init(void) {
-	//ADC1->SSPRI      = 0x0123;
 	ADC1->ACTSS     &= ~(1<<3);
-	ADC1->EMUX       =  (0xF<<12);
-	ADC1->SSMUX3     =  2;
+	ADC1->EMUX       =  (0x0F<<12);
+	ADC1->SSMUX3     =  (1<<1);
 	ADC1->SSCTL3     =  0x06;
 	ADC1->IM         =  (1<<3);
 	ADC1->ACTSS     |=  (1<<3);
 	ADC1->ISC        =  (1<<3);
-	NVIC_EnableIRQ(ADC1SS3_IRQn);
 }
 
 /* entry point..............................................................*/
@@ -58,7 +57,7 @@ int main() {
 	GPIOF_Init();
 	GPIOE_Init();
 	ADC1_Init();
-	//__enable_irq();
+	NVIC_EnableIRQ(ADC1SS3_IRQn);
 	while (1) {
 		if (adcResult > 2048) {
 			GPIOF->DATA |=  (1<<1);
